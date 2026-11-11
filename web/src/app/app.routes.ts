@@ -1,13 +1,15 @@
 import type { Routes } from '@angular/router';
-import { officeManager, signedIn, signedOut } from './core/guards';
+import { officeManager, signedIn } from './core/guards';
+import { SignInPage } from './sign-in/sign-in-page';
 
-/** Each page is its own chunk, loaded the first time someone opens it. */
+/** Each signed-in page is its own chunk, loaded the first time someone opens it. */
 export const routes: Routes = [
+  // In the main bundle, with no guard: the first page most visitors see
+  // renders without waiting for another chunk or for the API.
   {
     path: 'sign-in',
-    canMatch: [signedOut],
     title: $localize`:@@title.signIn:Connexion · Flex`,
-    loadComponent: () => import('./sign-in/sign-in-page').then((m) => m.SignInPage),
+    component: SignInPage,
   },
   {
     path: '',

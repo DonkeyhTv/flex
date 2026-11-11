@@ -23,12 +23,6 @@ export const officeManager: CanMatchFn = async () => {
   return session.isAdmin() || router.createUrlTree(['/']);
 };
 
-export const signedOut: CanMatchFn = async () => {
-  const session = inject(Session);
-  const router = inject(Router);
-  return !(await session.check()) || router.createUrlTree(['/']);
-};
-
 /** A 401 on any call but the session's own means the session ended under our feet. */
 export const sessionExpiry: HttpInterceptorFn = (request, next) => {
   const session = inject(Session);

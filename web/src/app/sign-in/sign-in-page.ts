@@ -39,6 +39,8 @@ export class SignInPage {
   });
 
   constructor() {
+    // Already signed in (a bookmark, the back button): go on to the app.
+    void this.session.check().then((member) => member && this.router.navigateByUrl(this.target()));
     this.api.demoAccounts().then(
       (demo) => this.demo.set(demo),
       () => this.demo.set(null),
@@ -61,13 +63,18 @@ export class SignInPage {
     try {
       const { email, password } = this.form.getRawValue();
       await this.session.signIn(email, password);
-      const back = this.back();
-      await this.router.navigateByUrl(back?.startsWith('/') && !back.startsWith('//') ? back : '/');
+      await this.router.navigateByUrl(this.target());
     } catch (error) {
       this.error.set(errorMessage(ApiError.from(error)));
     } finally {
       this.busy.set(false);
     }
+  }
+
+  /** Where to go next: the page asked for, if it is one of ours. */
+  private target(): string {
+    const back = this.back();
+    return back?.startsWith('/') && !back.startsWith('//') ? back : '/';
   }
 
   protected invalid(name: 'email' | 'password'): boolean {
