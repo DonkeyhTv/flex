@@ -1,4 +1,8 @@
 @use '@fontsource-variable/inter/wght.css';
+// The CDK's own styles: hidden live regions for screen readers, and the
+// overlay the team planning's menus open in.
+@use '@angular/cdk/a11y-prebuilt.css';
+@use '@angular/cdk/overlay-prebuilt.css';
 
 // Design tokens. Every colour pair meets WCAG AA contrast, in both themes.
 :root {

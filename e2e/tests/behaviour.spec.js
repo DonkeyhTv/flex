@@ -19,6 +19,10 @@ test('moves through the plan with the arrow keys, and picks with Enter', async (
   const code = next.replace('desk-', '').replace('-', '.');
   await expect(page.getByRole('heading', { level: 2, name: `Bureau ${code}` })).toBeVisible();
   await expect(focused).toHaveAttribute('aria-pressed', 'true');
+  // Screen readers hear the choice; sighted users don't see the announcement.
+  const announcer = page.locator('.cdk-live-announcer-element');
+  await expect(announcer).toContainText(`Bureau ${code} sélectionné`);
+  await expect(announcer).toHaveCSS('width', '1px');
 });
 
 test('the date strip is a radio group: arrows change the day', async ({ page, isMobile }) => {
