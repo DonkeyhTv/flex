@@ -1,0 +1,170 @@
+:host {
+  display: block;
+}
+
+.plan {
+  display: block;
+  width: 100%;
+  // Below this, the plan scrolls sideways instead of shrinking to unreadable.
+  min-width: 40rem;
+  height: auto;
+  font-family: var(--font);
+  user-select: none;
+
+  &__floor {
+    fill: var(--plan-floor);
+    stroke: var(--plan-wall);
+    stroke-width: 4;
+  }
+
+  &__window {
+    stroke: var(--plan-window);
+    stroke-width: 6;
+    stroke-linecap: round;
+  }
+
+  &__zone {
+    fill: var(--zone-fill, var(--plan-zone));
+    opacity: 0.45;
+  }
+
+  &__zone-label {
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  &__hatch-bg {
+    fill: var(--plan-floor);
+  }
+
+  &__hatch-line {
+    stroke: var(--line-strong);
+    stroke-width: 2;
+  }
+}
+
+.room {
+  rect {
+    fill: var(--plan-room);
+    stroke: var(--line);
+    stroke-width: 1.5;
+  }
+
+  &--stairs rect {
+    fill: url(#hatch);
+  }
+
+  &__name {
+    font-size: 14px;
+    font-weight: 600;
+    fill: var(--text-muted);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  &__seats {
+    font-size: 12px;
+    fill: var(--text-subtle);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+}
+
+.desk {
+  cursor: pointer;
+  outline: none;
+
+  &__chair {
+    fill: var(--plan-chair);
+  }
+
+  &__top {
+    fill: var(--surface);
+    stroke: var(--free);
+    stroke-width: 2;
+    transition: fill 0.15s;
+  }
+
+  &__half {
+    fill: var(--team);
+    opacity: 0.9;
+  }
+
+  &__text {
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--text);
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none;
+  }
+
+  &__ring {
+    fill: none;
+    stroke: var(--focus);
+    stroke-width: 3;
+    opacity: 0;
+  }
+
+  &:hover &__top {
+    fill: var(--free-soft);
+  }
+
+  &:focus-visible &__ring,
+  &--selected &__ring {
+    opacity: 1;
+  }
+
+  &--selected &__ring {
+    stroke: var(--accent);
+  }
+
+  &--partial &__top {
+    stroke: var(--partial);
+  }
+
+  &--full {
+    .desk__top {
+      stroke: transparent;
+    }
+
+    .desk__text {
+      fill: #fff;
+    }
+  }
+
+  &--mine {
+    .desk__top {
+      fill: var(--accent);
+      stroke: var(--accent-strong);
+    }
+
+    .desk__text {
+      fill: var(--on-accent);
+    }
+  }
+
+  &--mine:hover .desk__top {
+    fill: var(--accent-strong);
+  }
+
+  &--inactive {
+    cursor: not-allowed;
+
+    .desk__top,
+    &:hover .desk__top {
+      fill: url(#hatch);
+      stroke: var(--line-strong);
+    }
+
+    .desk__text {
+      fill: var(--text-subtle);
+    }
+  }
+
+  &--dimmed {
+    opacity: 0.28;
+  }
+}

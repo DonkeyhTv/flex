@@ -1,0 +1,97 @@
+<a class="skip-link" href="#main" i18n="@@shell.skip">Aller au contenu</a>
+
+@if (session.member(); as member) {
+  <header class="topbar">
+    <a class="brand" routerLink="/" i18n-aria-label="@@shell.home" aria-label="Flex, accueil">
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="3" y="3" width="11" height="11" rx="3" />
+        <rect x="18" y="3" width="11" height="11" rx="3" class="brand__accent" />
+        <rect x="3" y="18" width="11" height="11" rx="3" />
+        <rect x="18" y="18" width="11" height="11" rx="3" />
+      </svg>
+      <span class="brand__name">Flex</span>
+    </a>
+
+    <nav class="nav" i18n-aria-label="@@shell.nav" aria-label="Navigation principale">
+      <a
+        class="nav__link"
+        routerLink="/"
+        routerLinkActive="nav__link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
+        i18n="@@nav.book"
+        >Réserver</a
+      >
+      <a
+        class="nav__link"
+        routerLink="/my-bookings"
+        routerLinkActive="nav__link--active"
+        ariaCurrentWhenActive="page"
+        i18n="@@nav.mine"
+        >Mes réservations</a
+      >
+      <a
+        class="nav__link"
+        routerLink="/team"
+        routerLinkActive="nav__link--active"
+        ariaCurrentWhenActive="page"
+        i18n="@@nav.team"
+        >Équipe</a
+      >
+      @if (session.isAdmin()) {
+        <a
+          class="nav__link"
+          routerLink="/office"
+          routerLinkActive="nav__link--active"
+          ariaCurrentWhenActive="page"
+          i18n="@@nav.office"
+          >Bureaux</a
+        >
+      }
+    </nav>
+
+    <div class="topbar__end">
+      <app-language-switch />
+      <div class="user">
+        <span class="user__avatar" [class]="'team--' + member.team" aria-hidden="true">{{
+          member.name[0]
+        }}</span>
+        <span class="user__text">
+          <span class="user__name">{{ member.name }}</span>
+          <span class="user__team">{{ teamLabels[member.team] }}</span>
+        </span>
+      </div>
+      <button
+        type="button"
+        class="button button--small button--ghost"
+        (click)="session.signOut()"
+        i18n="@@shell.signOut"
+      >
+        Se déconnecter
+      </button>
+    </div>
+  </header>
+}
+
+<main id="main" tabindex="-1">
+  <router-outlet />
+</main>
+
+<div class="toasts">
+  @for (toast of toasts.list(); track toast.id) {
+    <div class="toast" [class]="'toast--' + toast.kind">
+      <span>{{ toast.message }}</span>
+      <button
+        type="button"
+        class="toast__close"
+        (click)="toasts.dismiss(toast.id)"
+        i18n-aria-label="@@toast.close"
+        aria-label="Fermer"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+  }
+</div>

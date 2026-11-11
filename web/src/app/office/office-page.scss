@@ -1,0 +1,275 @@
+:host {
+  --bar: #2d6fd1;
+
+  @media (prefers-color-scheme: dark) {
+    --bar: #6f9ef0;
+  }
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tile {
+  p {
+    margin: 0;
+  }
+
+  &__label {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  &__value {
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+
+    &--text {
+      font-size: 1.375rem;
+      line-height: 1.6;
+
+      &::first-letter {
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  &__hint {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+  }
+}
+
+.charts {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  @media (min-width: 1000px) {
+    grid-template-columns: 3fr 2fr;
+  }
+}
+
+.chart {
+  // A grid item may shrink below its content: the chart scrolls instead.
+  min-width: 0;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title {
+    margin: 0 0 1rem;
+    font-size: 1.0625rem;
+  }
+
+  &__head &__title {
+    margin: 0;
+  }
+
+  &__readout {
+    min-height: 2.5rem;
+    margin: 0.75rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
+
+  &__subtitle {
+    margin: 1.5rem 0 0.75rem;
+    font-size: 0.9375rem;
+  }
+}
+
+// One series: one hue, no legend; the value sits on each bar.
+.bars {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  height: 15rem;
+  margin-top: 1rem;
+  // Sideways scroll on a phone, rather than squeezed bars.
+  overflow-x: auto;
+
+  &__item {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    flex: 1;
+    justify-items: center;
+    gap: 0.375rem;
+    min-width: 2.75rem;
+    border-radius: var(--radius-small);
+    outline-offset: 4px;
+
+    &:hover .bars__fill,
+    &:focus-visible .bars__fill {
+      filter: brightness(1.12);
+    }
+  }
+
+  &__value {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__track {
+    display: flex;
+    align-items: flex-end;
+    width: min(100%, 2.25rem);
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  &__fill {
+    width: 100%;
+    min-height: 2px;
+    border-radius: 4px 4px 0 0;
+    background: var(--bar);
+  }
+
+  &__label {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: capitalize;
+    white-space: nowrap;
+  }
+}
+
+.hbars {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__item {
+    display: grid;
+    grid-template-columns: 9rem 1fr 3rem;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__label {
+    font-weight: 600;
+  }
+
+  &__count {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+
+  &__track {
+    height: 0.625rem;
+    border-radius: 999px;
+    background: var(--surface-hover);
+  }
+
+  &__fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--bar);
+  }
+
+  &__value {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.popular {
+  display: grid;
+  gap: 0.375rem;
+  margin: 0;
+  padding-left: 1.25rem;
+
+  &__count {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+  }
+}
+
+.desks {
+  &__scroll {
+    overflow-x: auto;
+  }
+
+  &__action {
+    text-align: right;
+
+    @media (min-width: 720px) {
+      white-space: nowrap;
+    }
+  }
+}
+
+// On a phone, the table keeps what decides an action: desk, area, state.
+@media (max-width: 719px) {
+  .wide-only {
+    display: none;
+  }
+
+  .desks .table th,
+  .desks .table td {
+    padding-inline: 0.375rem;
+  }
+
+  .disable {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+
+    &__input {
+      width: 100%;
+    }
+  }
+}
+
+.state {
+  font-weight: 600;
+
+  &--on {
+    color: var(--free-text);
+  }
+
+  &--off {
+    color: var(--danger);
+  }
+
+  &__reason {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    font-weight: 400;
+  }
+}
+
+.disable {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+
+  &__input {
+    width: 12rem;
+    min-height: 2rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-small);
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+  }
+}

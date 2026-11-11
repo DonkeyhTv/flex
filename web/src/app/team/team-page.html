@@ -1,0 +1,184 @@
+<div class="page">
+  <header class="page__header">
+    <div>
+      <h1 class="page__title" i18n="@@team.title">Planning d’équipe</h1>
+      <p class="page__lead" i18n="@@team.lead">
+        Qui vient quand. Faites glisser vos propres réservations pour changer de jour.
+      </p>
+    </div>
+    <div class="controls">
+      <label class="controls__team">
+        <span i18n="@@team.select">Équipe</span>
+        <select class="select" [value]="team()" (change)="selectTeam($any($event.target).value)">
+          @for (option of data()?.teams; track option) {
+            <option [value]="option" [selected]="option === team()">
+              {{ teamLabels[option] }}
+            </option>
+          }
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <div class="week-nav">
+    <button
+      type="button"
+      class="button button--small"
+      (click)="goToWeek(-1)"
+      i18n="@@team.previous"
+    >
+      ‹ Semaine précédente
+    </button>
+    <h2 class="week-nav__title" aria-live="polite">{{ title() }}</h2>
+    <button
+      type="button"
+      class="button button--small"
+      [disabled]="isThisWeek()"
+      (click)="goToWeek(0)"
+      i18n="@@team.thisWeek"
+    >
+      Cette semaine
+    </button>
+    <button
+      type="button"
+      class="button button--small"
+      [disabled]="!canGoForward()"
+      (click)="goToWeek(1)"
+      i18n="@@team.next"
+    >
+      Semaine suivante ›
+    </button>
+  </div>
+
+  @if (data(); as data) {
+    <div class="card grid-card" [attr.aria-busy]="moving()">
+      <table class="week" cdkDropListGroup>
+        <caption class="visually-hidden" i18n="@@team.caption">
+          Présence au bureau de l’équipe
+          {{
+            teamLabels[data.team]
+          }}, jour par jour
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" class="week__person-head" i18n="@@team.person">Personne</th>
+            @for (day of days(); track day.date) {
+              <th scope="col" [class.week__past]="!day.bookable">
+                <span class="week__weekday">{{ day.short }}</span>
+                <span class="week__count" i18n="@@team.present">{day.present, plural,
+                  =0 {personne}
+                  =1 {1 présent·e}
+                  other {{{day.present}} présent·es}
+                }</span>
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (member of members(); track member.id) {
+            <tr [class.week__me]="member.isMe">
+              <th scope="row" class="week__person">
+                <span class="dot" [class]="'team--' + data.team"></span>
+                {{ member.name }}
+                @if (member.isMe) {
+                  <span class="week__you" i18n="@@team.you">vous</span>
+                }
+              </th>
+              @for (day of days(); track day.date) {
+                @let booking = bookingOn(member.bookings, day.date);
+                @if (member.isMe) {
+                  <td
+                    class="week__cell week__cell--mine"
+                    [class.week__past]="!day.bookable"
+                    cdkDropList
+                    [cdkDropListData]="day.date"
+                    [cdkDropListEnterPredicate]="canDrop"
+                    [cdkDropListSortingDisabled]="true"
+                    (cdkDropListDropped)="dropped($event)"
+                  >
+                    @if (booking) {
+                      <div
+                        class="slot slot--mine"
+                        cdkDrag
+                        [cdkDragData]="booking"
+                        [cdkDragDisabled]="!day.bookable || moving()"
+                      >
+                        <span class="slot__code">{{ booking.deskCode }}</span>
+                        <span class="slot__when">{{ slotLabels[booking.slot] }}</span>
+                        @if (day.bookable && targetsFor(booking, member.bookings).length) {
+                          <button
+                            type="button"
+                            class="slot__menu"
+                            [cdkMenuTriggerFor]="moveMenu"
+                            [attr.aria-label]="moveLabel(day.weekday)"
+                          >
+                            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                              <circle cx="5" cy="12" r="2" />
+                              <circle cx="12" cy="12" r="2" />
+                              <circle cx="19" cy="12" r="2" />
+                            </svg>
+                          </button>
+                          <ng-template #moveMenu>
+                            <div class="menu" cdkMenu>
+                              <p class="menu__title" i18n="@@team.moveTo">Déplacer au…</p>
+                              @for (
+                                target of targetsFor(booking, member.bookings);
+                                track target.date
+                              ) {
+                                <button
+                                  type="button"
+                                  class="menu__item"
+                                  cdkMenuItem
+                                  (cdkMenuItemTriggered)="move(booking, target.date)"
+                                >
+                                  {{ target.weekday }}
+                                </button>
+                              }
+                            </div>
+                          </ng-template>
+                        }
+                        <div class="slot slot--placeholder" *cdkDragPlaceholder></div>
+                      </div>
+                    } @else if (day.bookable) {
+                      <a
+                        class="add"
+                        routerLink="/"
+                        [queryParams]="{ date: day.date }"
+                        [attr.aria-label]="bookLabel(day.weekday)"
+                        >+</a
+                      >
+                    }
+                  </td>
+                } @else {
+                  <td class="week__cell" [class.week__past]="!day.bookable">
+                    @if (booking) {
+                      <a
+                        class="slot"
+                        routerLink="/"
+                        [queryParams]="{ date: booking.date, desk: booking.deskId }"
+                        i18n-title="@@team.seeDesk"
+                        title="Voir sur le plan"
+                      >
+                        <span class="slot__code">{{ booking.deskCode }}</span>
+                        <span class="slot__when">{{ slotLabels[booking.slot] }}</span>
+                      </a>
+                    } @else {
+                      <span class="visually-hidden" i18n="@@team.away">absent·e</span>
+                    }
+                  </td>
+                }
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (!isMyTeam()) {
+      <p class="hint" i18n="@@team.otherTeam">
+        Vous regardez une autre équipe : vos réservations apparaissent dans la vôtre.
+      </p>
+    }
+  } @else {
+    <p class="visually-hidden" role="status" i18n="@@common.loading">Chargement…</p>
+  }
+</div>

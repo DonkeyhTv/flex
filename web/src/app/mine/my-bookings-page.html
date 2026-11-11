@@ -1,0 +1,66 @@
+<div class="page page--narrow">
+  <header class="page__header">
+    <div>
+      <h1 class="page__title" i18n="@@mine.title">Mes réservations</h1>
+      <p class="page__lead" i18n="@@mine.lead">
+        Les deux prochaines semaines, aujourd’hui compris.
+      </p>
+    </div>
+    <a class="button button--primary" routerLink="/" i18n="@@mine.new">Réserver un bureau</a>
+  </header>
+
+  @if (failed()) {
+    <p class="notice notice--warning" role="alert" i18n="@@mine.failed">
+      Vos réservations n’ont pas pu être chargées.
+    </p>
+  } @else if (bookings(); as bookings) {
+    @if (bookings.length) {
+      <ul class="bookings">
+        @for (booking of bookings; track booking.id) {
+          <li class="booking card">
+            <div class="booking__date">
+              <span class="booking__day">{{ day(booking.date) }}</span>
+              <span class="booking__slot">{{ slotLabels[booking.slot] }}</span>
+            </div>
+            <div class="booking__desk">
+              <span class="booking__code">{{ booking.deskCode }}</span>
+              <span class="booking__floor" i18n="@@mine.floor">Étage {{ level(booking) }}</span>
+            </div>
+            <div class="booking__actions">
+              <a
+                class="button button--small"
+                routerLink="/"
+                [queryParams]="{ date: booking.date, desk: booking.deskId }"
+                i18n="@@mine.show"
+              >
+                Voir sur le plan
+              </a>
+              <button
+                type="button"
+                class="button button--small"
+                [class.button--danger]="confirming() === booking.id"
+                [class.button--ghost]="confirming() !== booking.id"
+                (click)="cancel(booking)"
+              >
+                @if (confirming() === booking.id) {
+                  <ng-container i18n="@@mine.confirm">Confirmer l’annulation</ng-container>
+                } @else {
+                  <ng-container i18n="@@mine.cancel">Annuler</ng-container>
+                }
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="empty card">
+        <p i18n="@@mine.empty">Aucune réservation à venir.</p>
+        <a class="button button--primary" routerLink="/" i18n="@@mine.emptyAction"
+          >Choisir un bureau</a
+        >
+      </div>
+    }
+  } @else {
+    <p class="visually-hidden" role="status" i18n="@@common.loading">Chargement…</p>
+  }
+</div>

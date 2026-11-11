@@ -1,0 +1,243 @@
+<div class="page">
+  <header class="page__header">
+    <div>
+      <h1 class="page__title" i18n="@@office.title">Bureaux</h1>
+      <p class="page__lead" i18n="@@office.lead">
+        L’occupation sur les deux semaines qu’on peut réserver, et l’état de chaque poste.
+      </p>
+    </div>
+  </header>
+
+  @if (stats.value(); as stats) {
+    <section class="tiles" i18n-aria-label="@@office.summary" aria-label="Résumé">
+      <div class="tile card">
+        <p class="tile__label" i18n="@@office.rate">Taux d’occupation</p>
+        <p class="tile__value">{{ percent.format(stats.rate) }}</p>
+        <p class="tile__hint" i18n="@@office.rateHint">des demi-journées réservées</p>
+      </div>
+      @if (busiest(); as busiest) {
+        <div class="tile card">
+          <p class="tile__label" i18n="@@office.busiest">Jour le plus chargé</p>
+          <p class="tile__value tile__value--text">{{ busiest.full }}</p>
+          <p class="tile__hint">{{ percent.format(busiest.rate) }}</p>
+        </div>
+      }
+      <div class="tile card">
+        <p class="tile__label" i18n="@@office.outCount">Hors service</p>
+        <p class="tile__value">{{ stats.outOfService }}</p>
+        <p class="tile__hint" i18n="@@office.outHint">bureau(x) indisponible(s)</p>
+      </div>
+    </section>
+
+    <div class="charts">
+      <section class="card chart" aria-labelledby="by-day">
+        <div class="chart__head">
+          <h2 id="by-day" class="chart__title" i18n="@@office.byDay">Occupation par jour</h2>
+          <button
+            type="button"
+            class="button button--small button--ghost"
+            [attr.aria-pressed]="showTable()"
+            (click)="showTable.set(!showTable())"
+            i18n="@@office.asTable"
+          >
+            Voir en tableau
+          </button>
+        </div>
+        @if (showTable()) {
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col" i18n="@@office.day">Jour</th>
+                <th scope="col" i18n="@@office.morning">Matin</th>
+                <th scope="col" i18n="@@office.afternoon">Après-midi</th>
+                <th scope="col" i18n="@@office.rateCol">Occupation</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (day of days(); track day.date) {
+                <tr>
+                  <th scope="row">{{ day.full }}</th>
+                  <td>{{ day.am }} / {{ day.capacity }}</td>
+                  <td>{{ day.pm }} / {{ day.capacity }}</td>
+                  <td>{{ percent.format(day.rate) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <div class="bars" role="list">
+            @for (day of days(); track day.date) {
+              <div
+                class="bars__item"
+                role="listitem"
+                tabindex="0"
+                [attr.aria-label]="tooltip(day)"
+                (mouseenter)="hovered.set(day.date)"
+                (focus)="hovered.set(day.date)"
+                (mouseleave)="hovered.set(null)"
+                (blur)="hovered.set(null)"
+              >
+                <span class="bars__value">{{ percent.format(day.rate) }}</span>
+                <span class="bars__track"
+                  ><span class="bars__fill" [style.height.%]="day.rate * 100"></span
+                ></span>
+                <span class="bars__label">{{ day.label }}</span>
+              </div>
+            }
+          </div>
+          <!-- The detail of the bar under the pointer or the focus; screen readers get it from the bar itself. -->
+          <p class="chart__readout" aria-hidden="true">
+            @if (hoveredDay(); as day) {
+              {{ tooltip(day) }}
+            } @else {
+              <ng-container i18n="@@office.readoutHint"
+                >Survolez ou sélectionnez une barre pour le détail.</ng-container
+              >
+            }
+          </p>
+        }
+      </section>
+
+      <section class="card chart" aria-labelledby="by-zone">
+        <h2 id="by-zone" class="chart__title" i18n="@@office.byZone">Par zone</h2>
+        <ul class="hbars">
+          @for (zone of stats.zones; track zone.zone) {
+            <li class="hbars__item">
+              <span class="hbars__label"
+                >{{ zoneLabels[zone.zone] }}
+                <span class="hbars__count" i18n="@@office.desks">{zone.desks, plural,
+                  =1 {1 bureau}
+                  other {{{zone.desks}} bureaux}
+                }</span></span
+              >
+              <span class="hbars__track" aria-hidden="true"
+                ><span class="hbars__fill" [style.width.%]="zone.rate * 100"></span
+              ></span>
+              <span class="hbars__value">{{ percent.format(zone.rate) }}</span>
+            </li>
+          }
+        </ul>
+
+        <h3 class="chart__subtitle" i18n="@@office.popular">Bureaux les plus demandés</h3>
+        <ol class="popular">
+          @for (desk of stats.popular; track desk.code) {
+            <li>
+              <strong>{{ desk.code }}</strong> · {{ zoneLabels[desk.zone] }}
+              <span class="popular__count" i18n="@@office.halfDays">{desk.halfDays, plural,
+                =1 {1 demi-journée}
+                other {{{desk.halfDays}} demi-journées}
+              }</span>
+            </li>
+          }
+        </ol>
+      </section>
+    </div>
+  } @else if (stats.error()) {
+    <p class="notice notice--warning" role="alert" i18n="@@office.failed">
+      Les statistiques n’ont pas pu être chargées.
+    </p>
+  }
+
+  <section class="card desks" aria-labelledby="desks-title">
+    <h2 id="desks-title" class="chart__title" i18n="@@office.desksTitle">Postes de travail</h2>
+    <div class="desks__scroll">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col" i18n="@@list.desk">Bureau</th>
+            <th scope="col" class="wide-only" i18n="@@office.floor">Étage</th>
+            <th scope="col" i18n="@@list.zone">Zone</th>
+            <th scope="col" class="wide-only" i18n="@@list.equipment">Équipement</th>
+            <th scope="col" i18n="@@office.state">État</th>
+            <th scope="col">
+              <span class="visually-hidden" i18n="@@office.actions">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (desk of desks(); track desk.id) {
+            <tr>
+              <th scope="row">{{ desk.code }}</th>
+              <td class="wide-only">{{ desk.level }}</td>
+              <td>{{ zoneLabels[desk.zone] }}</td>
+              <td class="wide-only">
+                @for (item of desk.equipment; track item; let last = $last) {
+                  {{ equipmentLabels[item] }}
+                  @if (!last) {
+                    ,
+                  }
+                }
+              </td>
+              <td>
+                @if (desk.active) {
+                  <span class="state state--on" i18n="@@office.inService">En service</span>
+                } @else {
+                  <span class="state state--off" i18n="@@office.outState">Hors service</span>
+                  @if (desk.disabledReason) {
+                    <span class="state__reason">{{ desk.disabledReason }}</span>
+                  }
+                }
+              </td>
+              <td class="desks__action">
+                @if (!desk.active) {
+                  <button
+                    type="button"
+                    class="button button--small"
+                    [disabled]="busy()"
+                    (click)="setActive(desk, true)"
+                    i18n="@@office.enable"
+                  >
+                    Remettre en service
+                  </button>
+                } @else if (editing() === desk.id) {
+                  <form class="disable" (submit)="$event.preventDefault(); setActive(desk, false)">
+                    <label
+                      class="visually-hidden"
+                      [attr.for]="'reason-' + desk.id"
+                      i18n="@@office.reason"
+                      >Raison</label
+                    >
+                    <input
+                      class="disable__input"
+                      [id]="'reason-' + desk.id"
+                      maxlength="120"
+                      i18n-placeholder="@@office.reasonPlaceholder"
+                      placeholder="Raison (facultatif)"
+                      [value]="reason()"
+                      (input)="reason.set($any($event.target).value)"
+                    />
+                    <button
+                      type="submit"
+                      class="button button--small button--primary"
+                      [disabled]="busy()"
+                      i18n="@@office.confirmDisable"
+                    >
+                      Confirmer
+                    </button>
+                    <button
+                      type="button"
+                      class="button button--small button--ghost"
+                      (click)="editing.set(null)"
+                      i18n="@@office.cancelDisable"
+                    >
+                      Annuler
+                    </button>
+                  </form>
+                } @else {
+                  <button
+                    type="button"
+                    class="button button--small button--ghost"
+                    (click)="edit(desk)"
+                    i18n="@@office.disable"
+                  >
+                    Mettre hors service
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,242 @@
+.controls__team {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.week-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  &__title {
+    margin: 0 auto 0 0.5rem;
+    order: -1;
+    width: 100%;
+    font-size: 1.125rem;
+
+    @media (min-width: 720px) {
+      width: auto;
+    }
+  }
+}
+
+.grid-card {
+  padding: 0;
+  overflow-x: auto;
+}
+
+.week {
+  width: 100%;
+  min-width: 46rem;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  th,
+  td {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  thead th {
+    background: var(--surface-hover);
+    font-size: 0.875rem;
+  }
+
+  &__person-head,
+  &__person {
+    width: 13rem;
+    padding-left: 1rem !important;
+  }
+
+  &__person {
+    font-weight: 600;
+    white-space: nowrap;
+
+    .dot {
+      margin-right: 0.375rem;
+    }
+  }
+
+  &__weekday {
+    display: block;
+    text-transform: capitalize;
+  }
+
+  &__count {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 0.75rem;
+  }
+
+  &__you {
+    margin-left: 0.375rem;
+    padding: 0 0.4rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-size: 0.6875rem;
+    font-weight: 700;
+  }
+
+  &__me {
+    background: var(--accent-soft);
+  }
+
+  &__cell {
+    height: 3.75rem;
+  }
+
+  // Past days: a quieter background, never a lower contrast.
+  &__past {
+    background: var(--bg);
+  }
+
+  thead &__past {
+    background: var(--bg);
+    color: var(--text-muted);
+  }
+}
+
+.slot {
+  position: relative;
+  display: grid;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--team, var(--line-strong));
+  border-radius: var(--radius-small);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  line-height: 1.25;
+
+  &:hover {
+    border-color: var(--line-strong);
+  }
+
+  &--mine {
+    padding-right: 2rem;
+    border-left-color: var(--accent);
+    cursor: grab;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.08);
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &--placeholder {
+    min-height: 2.75rem;
+    border: 2px dashed var(--line-strong);
+    background: transparent;
+  }
+
+  &__code {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__when {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  &__menu {
+    position: absolute;
+    top: 50%;
+    right: 0.25rem;
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 0;
+    border-radius: var(--radius-small);
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transform: translateY(-50%);
+
+    svg {
+      fill: currentColor;
+    }
+
+    &:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+    }
+  }
+}
+
+// The chip while it is dragged, outside the table.
+:host ::ng-deep .cdk-drag-preview {
+  box-shadow: var(--shadow);
+}
+
+.cdk-drop-list-receiving {
+  background: var(--free-soft);
+}
+
+.cdk-drop-list-dragging {
+  outline: 2px dashed var(--free);
+  outline-offset: -4px;
+}
+
+.add {
+  display: grid;
+  place-items: center;
+  height: 2.75rem;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-small);
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  text-decoration: none;
+
+  &:hover {
+    border-color: var(--ink);
+    color: var(--text);
+  }
+}
+
+.menu {
+  display: grid;
+  min-width: 11rem;
+  padding: 0.375rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+
+  &__title {
+    margin: 0.25rem 0.5rem 0.375rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  &__item {
+    padding: 0.5rem 0.625rem;
+    border: 0;
+    border-radius: var(--radius-small);
+    background: none;
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    text-transform: capitalize;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+      background: var(--surface-hover);
+      outline: none;
+    }
+  }
+}
+
+.hint {
+  color: var(--text-muted);
+}

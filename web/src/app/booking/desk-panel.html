@@ -1,0 +1,192 @@
+@let selected = store.selected();
+@let mine = store.myBooking();
+
+@if (selected) {
+  <section class="panel" aria-labelledby="desk-title">
+    <header class="panel__header">
+      <div>
+        <p class="panel__eyebrow">
+          {{ zoneLabels[selected.desk.zone] }} · {{ floorLabels[floorLevel()] }}
+        </p>
+        <h2 id="desk-title" class="panel__title" i18n="@@panel.deskTitle">
+          Bureau {{ selected.desk.code }}
+        </h2>
+      </div>
+      <button
+        type="button"
+        class="icon-button"
+        (click)="store.select(null)"
+        i18n-aria-label="@@panel.close"
+        aria-label="Fermer le détail du bureau"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </header>
+
+    @if (selected.desk.equipment.length) {
+      <ul class="tags" i18n-aria-label="@@panel.equipment" aria-label="Équipement">
+        @for (item of selected.desk.equipment; track item) {
+          <li class="tag">{{ equipmentLabels[item] }}</li>
+        }
+      </ul>
+    }
+
+    <dl class="halves">
+      <div class="halves__row">
+        <dt>{{ slotLabels.am }}</dt>
+        <dd [class.halves__free]="!selected.am">
+          @if (selected.am) {
+            <span class="dot" [class]="'team--' + selected.am.user.team"></span
+            >{{ selected.am.user.name }}
+          } @else {
+            <ng-container i18n="@@panel.free">Libre</ng-container>
+          }
+        </dd>
+      </div>
+      <div class="halves__row">
+        <dt>{{ slotLabels.pm }}</dt>
+        <dd [class.halves__free]="!selected.pm">
+          @if (selected.pm) {
+            <span class="dot" [class]="'team--' + selected.pm.user.team"></span
+            >{{ selected.pm.user.name }}
+          } @else {
+            <ng-container i18n="@@panel.free">Libre</ng-container>
+          }
+        </dd>
+      </div>
+    </dl>
+
+    @switch (selected.status) {
+      @case ('inactive') {
+        <p class="notice notice--warning">
+          <strong i18n="@@panel.inactive">Hors service.</strong>
+          {{ selected.desk.disabledReason }}
+        </p>
+      }
+      @case ('mine') {
+        <p class="notice notice--accent" i18n="@@panel.yours">C’est votre bureau ce jour-là.</p>
+        <button
+          type="button"
+          class="button button--ghost"
+          [disabled]="store.busy()"
+          (click)="store.cancel(mine!)"
+          i18n="@@panel.cancel"
+        >
+          Annuler ma réservation
+        </button>
+      }
+      @default {
+        @if (mine) {
+          <p class="notice" i18n="@@panel.alreadyElsewhere">
+            Vous êtes déjà au bureau {{ mine.deskCode }} ce jour-là.
+          </p>
+          @if (canMoveHere()) {
+            <button
+              type="button"
+              class="button"
+              [disabled]="store.busy()"
+              (click)="store.moveHere()"
+              i18n="@@panel.moveHere"
+            >
+              Déplacer ma réservation ici
+            </button>
+          }
+        } @else if (slots().length) {
+          <form class="book" (submit)="book($event)">
+            <fieldset class="book__slots">
+              <legend i18n="@@panel.when">Quand ?</legend>
+              @for (option of slots(); track option) {
+                <label class="choice">
+                  <input
+                    type="radio"
+                    name="slot"
+                    [value]="option"
+                    [checked]="slot() === option"
+                    (change)="slot.set(option)"
+                  />
+                  <span>{{ slotLabels[option] }}</span>
+                </label>
+              }
+            </fieldset>
+            <button
+              type="submit"
+              class="button button--primary"
+              [disabled]="store.busy()"
+              i18n="@@panel.book"
+            >
+              Réserver ce bureau
+            </button>
+          </form>
+        } @else {
+          <p class="notice" i18n="@@panel.full">Ce bureau est pris toute la journée.</p>
+        }
+      }
+    }
+  </section>
+} @else {
+  <section class="panel" aria-labelledby="day-title">
+    <header class="panel__header">
+      <div>
+        <p class="panel__eyebrow" i18n="@@panel.yourDay">Votre journée</p>
+        <h2 id="day-title" class="panel__title panel__title--day">{{ dayTitle() }}</h2>
+      </div>
+    </header>
+
+    @if (mine) {
+      <div class="booking-card">
+        <p class="booking-card__label" i18n="@@panel.yourDesk">Votre bureau</p>
+        <p class="booking-card__code">{{ mine.deskCode }}</p>
+        <p class="booking-card__meta">{{ slotLabels[mine.slot] }}</p>
+        <div class="booking-card__actions">
+          <button
+            type="button"
+            class="button button--small"
+            (click)="store.select(mine.deskId)"
+            i18n="@@panel.showOnPlan"
+          >
+            Voir sur le plan
+          </button>
+          <button
+            type="button"
+            class="button button--small button--ghost"
+            [disabled]="store.busy()"
+            (click)="store.cancel(mine)"
+            i18n="@@panel.cancelShort"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    } @else {
+      <p class="panel__hint" i18n="@@panel.hint">
+        Vous n’avez pas encore de bureau ce jour-là. Choisissez un bureau libre sur le plan.
+      </p>
+    }
+
+    <h3 class="panel__subtitle" i18n="@@panel.teamToday">Votre équipe ce jour-là</h3>
+    @if (store.teammates().length) {
+      <ul class="people">
+        @for (booking of store.teammates(); track booking.id) {
+          <li>
+            <button type="button" class="people__item" (click)="store.select(booking.deskId)">
+              <span class="dot" [class]="'team--' + booking.user.team"></span>
+              <span class="people__name">{{ booking.user.name }}</span>
+              <span class="people__desk"
+                >{{ booking.deskCode }}
+                @if (booking.slot !== 'day') {
+                  · {{ slotLabels[booking.slot] }}
+                }
+              </span>
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="panel__hint" i18n="@@panel.teamAway">
+        Personne de votre équipe n’a encore réservé.
+      </p>
+    }
+  </section>
+}

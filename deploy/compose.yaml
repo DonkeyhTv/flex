@@ -1,0 +1,46 @@
+# Production: the API, the web server and PostgreSQL. Only the web server
+# listens, on the host's loopback by default: the host's nginx does HTTPS.
+name: flex-prod
+
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: flex
+      POSTGRES_USER: flex
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?set DATABASE_PASSWORD in deploy/.env}
+    # A small office needs a small database.
+    command: ['postgres', '-c', 'shared_buffers=48MB', '-c', 'max_connections=30']
+    volumes:
+      - db:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U flex -d flex']
+      interval: 3s
+      retries: 30
+
+  api:
+    build: ../api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://flex:${DATABASE_PASSWORD}@db:5432/flex
+      # The web server's nginx, plus the host's in front of it.
+      TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-2}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      # Sign-in attempts per minute and address (raised for the browser tests only).
+      SIGN_IN_LIMIT: ${SIGN_IN_LIMIT:-10}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: ../web
+    restart: unless-stopped
+    ports:
+      - '${HTTP_BIND:-127.0.0.1}:${HTTP_PORT:-8092}:80'
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  db:

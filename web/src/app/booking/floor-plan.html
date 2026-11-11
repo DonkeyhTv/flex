@@ -1,0 +1,134 @@
+<svg
+  class="plan"
+  [attr.viewBox]="'0 0 ' + office().width + ' ' + office().height"
+  role="group"
+  [attr.aria-label]="title()"
+>
+  <defs>
+    <pattern
+      id="hatch"
+      width="6"
+      height="6"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(45)"
+    >
+      <rect width="6" height="6" class="plan__hatch-bg" />
+      <line x1="0" y1="0" x2="0" y2="6" class="plan__hatch-line" />
+    </pattern>
+  </defs>
+
+  <rect
+    class="plan__floor"
+    x="20"
+    y="20"
+    [attr.width]="office().width - 40"
+    [attr.height]="office().height - 40"
+    rx="14"
+  />
+  <!-- The windows, along the top wall. -->
+  @for (x of windows(); track x) {
+    <line class="plan__window" [attr.x1]="x" y1="20" [attr.x2]="x + 90" y2="20" />
+  }
+
+  @for (zone of zones(); track zone.zone) {
+    <g aria-hidden="true">
+      <rect
+        class="plan__zone"
+        [class]="'zone--' + zone.zone"
+        [attr.x]="zone.x"
+        [attr.y]="zone.y"
+        [attr.width]="zone.width"
+        [attr.height]="zone.height"
+        rx="12"
+      />
+      <text class="plan__zone-label" [attr.x]="zone.x + 12" [attr.y]="zone.y + 18">
+        {{ zone.label }}
+      </text>
+    </g>
+  }
+
+  @for (room of floor().rooms; track room.id) {
+    <g class="room" [class]="'room--' + room.kind" aria-hidden="true">
+      <rect
+        [attr.x]="room.x"
+        [attr.y]="room.y"
+        [attr.width]="room.width"
+        [attr.height]="room.height"
+        rx="10"
+      />
+      <text
+        class="room__name"
+        [attr.x]="room.x + room.width / 2"
+        [attr.y]="room.y + room.height / 2"
+      >
+        {{ room.name ?? roomLabels[room.kind] }}
+      </text>
+      @if (room.seats) {
+        <text
+          class="room__seats"
+          [attr.x]="room.x + room.width / 2"
+          [attr.y]="room.y + room.height / 2 + 18"
+        >
+          <tspan i18n="@@plan.seats">{room.seats, plural, other {{{room.seats}} places}}</tspan>
+        </text>
+      }
+    </g>
+  }
+
+  @for (state of states(); track state.desk.id) {
+    <g
+      class="desk"
+      [class]="'desk--' + state.status"
+      [class.desk--dimmed]="!state.matches"
+      [class.desk--selected]="state.desk.id === selectedId()"
+      [attr.transform]="'translate(' + state.desk.x + ' ' + state.desk.y + ')'"
+      [attr.data-desk]="state.desk.id"
+      role="button"
+      [attr.tabindex]="state.desk.id === tabStop() ? 0 : -1"
+      [attr.aria-label]="accessibleName(state)"
+      [attr.aria-pressed]="state.desk.id === selectedId()"
+      (click)="pick(state.desk.id)"
+      (keydown)="onKeydown($event, state)"
+    >
+      <circle
+        class="desk__chair"
+        [attr.cx]="deskWidth() / 2"
+        [attr.cy]="state.desk.facing === 'north' ? -6 : deskHeight() + 6"
+        r="6"
+      />
+      <rect class="desk__top" [attr.width]="deskWidth()" [attr.height]="deskHeight()" rx="5" />
+      @if (state.status === 'partial' || state.status === 'full') {
+        @if (state.am) {
+          <rect
+            class="desk__half"
+            [class]="'team--' + state.am.user.team"
+            [attr.width]="deskWidth() / 2"
+            [attr.height]="deskHeight()"
+            rx="5"
+          />
+        }
+        @if (state.pm) {
+          <rect
+            class="desk__half"
+            [class]="'team--' + state.pm.user.team"
+            [attr.x]="deskWidth() / 2"
+            [attr.width]="deskWidth() / 2"
+            [attr.height]="deskHeight()"
+            rx="5"
+          />
+        }
+      }
+      <text class="desk__text" [attr.x]="deskWidth() / 2" [attr.y]="deskHeight() / 2">
+        {{ text(state) }}
+      </text>
+      <rect
+        class="desk__ring"
+        x="-5"
+        y="-5"
+        [attr.width]="deskWidth() + 10"
+        [attr.height]="deskHeight() + 10"
+        rx="8"
+      />
+    </g>
+  }
+</svg>

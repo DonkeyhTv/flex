@@ -1,0 +1,171 @@
+.sign-in {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+  max-width: 72rem;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 3rem);
+
+  @media (min-width: 960px) {
+    grid-template-columns: 1.1fr 1fr;
+    gap: 4rem;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 800;
+
+    svg {
+      width: 2rem;
+      height: 2rem;
+      fill: var(--ink);
+    }
+
+    .accent {
+      fill: var(--accent);
+    }
+  }
+
+  &__headline {
+    margin: 1.5rem 0 1rem;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    letter-spacing: -0.03em;
+  }
+
+  &__lead {
+    max-width: 36rem;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 1.0625rem;
+  }
+
+  &__points {
+    display: grid;
+    gap: 0.5rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+
+    li::before {
+      content: '';
+      display: inline-block;
+      width: 0.625rem;
+      height: 0.625rem;
+      margin-right: 0.625rem;
+      border-radius: 3px;
+      background: var(--accent);
+    }
+  }
+
+  &__form {
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h2 {
+      margin: 0;
+    }
+  }
+}
+
+.demo {
+  display: grid;
+  gap: 0.75rem;
+
+  &__title,
+  &__note {
+    margin: 0;
+  }
+
+  &__title {
+    font-weight: 600;
+  }
+
+  &__note {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+  }
+
+  &__accounts {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  &__account {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--ink);
+      background: var(--surface-hover);
+    }
+  }
+
+  &__avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--team);
+    color: #fff;
+    font-weight: 700;
+  }
+
+  &__name {
+    display: block;
+    font-weight: 700;
+  }
+
+  &__role {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+}
+
+.demo-placeholder {
+  // The height of the two demo accounts and the line below them.
+  min-height: 17.5rem;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--line);
+  }
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+}

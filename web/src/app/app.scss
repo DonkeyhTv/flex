@@ -1,0 +1,172 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.625rem clamp(1rem, 3vw, 2rem);
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+
+  @media (max-width: 860px) {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+  }
+
+  &__end {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: auto;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text);
+  text-decoration: none;
+
+  &__mark {
+    width: 1.75rem;
+    height: 1.75rem;
+    fill: var(--ink);
+  }
+
+  &__accent {
+    fill: var(--accent);
+  }
+
+  &__name {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+}
+
+.nav {
+  display: flex;
+  gap: 0.25rem;
+
+  @media (max-width: 860px) {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  &__link {
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-small);
+    color: var(--text-muted);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover,
+    &--active {
+      color: var(--text);
+      background: var(--surface-hover);
+    }
+  }
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &__avatar {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--team);
+    color: #fff;
+    font-weight: 700;
+  }
+
+  &__text {
+    display: grid;
+    line-height: 1.2;
+
+    @media (max-width: 600px) {
+      display: none;
+    }
+  }
+
+  &__name {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  &__team {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+}
+
+main {
+  outline: none;
+}
+
+.toasts {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 20;
+  display: grid;
+  gap: 0.5rem;
+  max-width: min(26rem, calc(100vw - 2rem));
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--on-ink);
+  box-shadow: var(--shadow);
+  animation: toast-in 0.2s ease-out;
+
+  &--error {
+    background: var(--danger);
+    color: #fff;
+  }
+
+  span {
+    flex: 1;
+  }
+
+  &__close {
+    display: grid;
+    place-items: center;
+    padding: 0.125rem;
+    border: 0;
+    border-radius: var(--radius-small);
+    background: none;
+    color: inherit;
+    cursor: pointer;
+
+    svg {
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}

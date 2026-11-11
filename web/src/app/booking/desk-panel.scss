@@ -1,0 +1,157 @@
+.panel {
+  display: grid;
+  gap: 1rem;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &__eyebrow {
+    margin: 0 0 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.5rem;
+
+    &--day::first-letter {
+      text-transform: uppercase;
+    }
+  }
+
+  &__subtitle {
+    margin: 0.5rem 0 0;
+    font-size: 0.9375rem;
+  }
+
+  &__hint {
+    margin: 0;
+    color: var(--text-muted);
+  }
+}
+
+.halves {
+  display: grid;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.625rem 0.875rem;
+
+    & + & {
+      border-top: 1px solid var(--line);
+    }
+  }
+
+  dt {
+    color: var(--text-muted);
+  }
+
+  dd {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-weight: 600;
+  }
+
+  &__free {
+    color: var(--free-text);
+  }
+}
+
+.book {
+  display: grid;
+  gap: 1rem;
+
+  &__slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    legend {
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+  }
+}
+
+.booking-card {
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+
+  p {
+    margin: 0;
+  }
+
+  &__label {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  &__code {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+}
+
+.people {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    border: 0;
+    border-radius: var(--radius-small);
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--surface-hover);
+    }
+  }
+
+  &__name {
+    flex: 1;
+  }
+
+  &__desk {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+}

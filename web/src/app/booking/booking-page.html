@@ -1,0 +1,172 @@
+<div class="page">
+  <header class="page__header">
+    <h1 class="page__title" i18n="@@booking.title">Réserver un bureau</h1>
+    <app-date-strip
+      [days]="store.days()"
+      [selected]="store.date()"
+      (pick)="store.selectDate($event)"
+    />
+  </header>
+
+  <div class="toolbar">
+    <div class="segmented" role="group" i18n-aria-label="@@booking.floors" aria-label="Étages">
+      @for (floor of store.office()?.floors; track floor.id) {
+        <button
+          type="button"
+          class="segmented__item"
+          [attr.aria-pressed]="floor.id === store.floorId()"
+          (click)="store.selectFloor(floor.id)"
+        >
+          {{ floorLabels[floor.level] }}
+          <span
+            class="segmented__count"
+            i18n="@@booking.freeCount"
+            >{store.freeByFloor()[floor.id] ?? 0, plural,
+              =0 {complet}
+              =1 {1 libre}
+              other {{{store.freeByFloor()[floor.id]}} libres}
+            }</span
+          >
+        </button>
+      }
+    </div>
+
+    <div
+      class="filters"
+      role="group"
+      i18n-aria-label="@@booking.filters"
+      aria-label="Équipement souhaité"
+    >
+      @for (item of equipment; track item) {
+        <button
+          type="button"
+          class="chip"
+          [attr.aria-pressed]="store.filters().includes(item)"
+          (click)="store.toggleFilter(item)"
+        >
+          {{ equipmentLabels[item] }}
+        </button>
+      }
+    </div>
+
+    <div
+      class="segmented segmented--compact"
+      role="group"
+      i18n-aria-label="@@booking.view"
+      aria-label="Affichage"
+    >
+      <button
+        type="button"
+        class="segmented__item"
+        [attr.aria-pressed]="store.view() === 'plan'"
+        (click)="store.setView('plan')"
+        i18n="@@booking.viewPlan"
+      >
+        Plan
+      </button>
+      <button
+        type="button"
+        class="segmented__item"
+        [attr.aria-pressed]="store.view() === 'list'"
+        (click)="store.setView('list')"
+        i18n="@@booking.viewList"
+      >
+        Liste
+      </button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="card layout__plan" [attr.aria-busy]="store.loading()">
+      @if (store.failed()) {
+        <p class="notice notice--warning" role="alert" i18n="@@booking.failed">
+          Le plan n’a pas pu être chargé. Rechargez la page.
+        </p>
+      } @else if (store.office() && store.floor(); as floor) {
+        @if (store.view() === 'plan') {
+          <app-floor-plan
+            [office]="store.office()!"
+            [floor]="floor"
+            [states]="store.floorStates()"
+            [selectedId]="store.selectedDeskId()"
+            (picked)="pick($event)"
+          />
+          <ul class="legend" i18n-aria-label="@@legend.label" aria-label="Légende">
+            <li>
+              <span class="legend__swatch legend__swatch--free"></span
+              ><ng-container i18n="@@legend.free">Libre</ng-container>
+            </li>
+            <li>
+              <span class="legend__swatch legend__swatch--partial"></span
+              ><ng-container i18n="@@legend.partial">Libre une demi-journée</ng-container>
+            </li>
+            <li>
+              <span class="legend__swatch legend__swatch--full"></span
+              ><ng-container i18n="@@legend.full">Pris (couleur de l’équipe)</ng-container>
+            </li>
+            <li>
+              <span class="legend__swatch legend__swatch--mine"></span
+              ><ng-container i18n="@@legend.mine">Votre bureau</ng-container>
+            </li>
+            <li>
+              <span class="legend__swatch legend__swatch--inactive"></span
+              ><ng-container i18n="@@legend.inactive">Hors service</ng-container>
+            </li>
+          </ul>
+        } @else {
+          <table class="table">
+            <caption class="visually-hidden" i18n="@@list.caption">
+              Bureaux de l’étage et leur disponibilité
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col" i18n="@@list.desk">Bureau</th>
+                <th scope="col" i18n="@@list.zone">Zone</th>
+                <th scope="col" i18n="@@list.equipment">Équipement</th>
+                <th scope="col" i18n="@@list.availability">Disponibilité</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (state of store.floorStates(); track state.desk.id) {
+                @if (state.matches) {
+                  <tr [class.table__row--selected]="state.desk.id === store.selectedDeskId()">
+                    <th scope="row">
+                      <button
+                        type="button"
+                        class="link-button"
+                        [attr.aria-pressed]="state.desk.id === store.selectedDeskId()"
+                        (click)="pick(state.desk.id)"
+                      >
+                        {{ state.desk.code }}
+                      </button>
+                    </th>
+                    <td>{{ zoneLabels[state.desk.zone] }}</td>
+                    <td>
+                      @for (item of state.desk.equipment; track item; let last = $last) {
+                        {{ equipmentLabels[item] }}
+                        @if (!last) {
+                          ,
+                        }
+                      }
+                    </td>
+                    <td>
+                      <span class="status" [class]="'status--' + state.status">{{
+                        availability(state)
+                      }}</span>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        }
+      } @else {
+        <div class="skeleton" aria-hidden="true"></div>
+      }
+    </div>
+
+    <aside class="card layout__panel">
+      <app-desk-panel />
+    </aside>
+  </div>
+</div>
